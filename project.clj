@@ -1,4 +1,4 @@
-(defproject ntestoc3/common "0.1.0"
+(defproject ntestoc3/common "0.2.0-SNAPSHOT"
   :description "my common libs helper"
   :url "https://github.com/ntestoc3/common"
   :license {:name "MIT"
