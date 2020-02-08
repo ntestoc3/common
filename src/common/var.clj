@@ -1,6 +1,5 @@
 (ns common.var)
 
-(clojure.core/var )
 (defmacro pull
   "导出ns下的符号到当前命名空间"
   [ns vlist]
