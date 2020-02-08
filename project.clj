@@ -1,6 +1,6 @@
 (defproject ntestoc3/common "0.1.0"
-  :description "my common libs"
-  :url "http://example.com/FIXME"
+  :description "my common libs helper"
+  :url "https://github.com/ntestoc3/common"
   :license {:name "MIT"
             :url "https://opensource.org/licenses/MIT"}
   :dependencies [[org.clojure/clojure "1.10.1"]

@@ -7,7 +7,8 @@
             [common.var :refer [pull]]
             [common.config :refer [get-config]]
             [taoensso.timbre :as log]
-            )
+
+            [me.raynes.fs :as fs])
   (:import (org.apache.http.impl.cookie BasicClientCookie2)
            (java.net URL)
            (java.security.cert Certificate X509Certificate)
@@ -38,16 +39,16 @@
    :path "/",
    :value v})
 
+(def default-ua "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.87 Safari/537.36")
+
 (defn build-header
   "从默认配置的http header加上custom-header构造http头"
   ([] (build-header {}))
   ([custom-header]
     (merge (get-config :default-header)
-           {:headers {"User-Agent" (get-config :user-agent)
+           {:headers {"User-Agent" (get-config :user-agent default-ua)
                       "Accept-Charset" "utf-8"}}
            custom-header)))
-
-
 
 (defn get-cert-info
   [https-url]
@@ -60,10 +61,11 @@
 (defn random-ua
   "返回一个随机的user-agent"
   []
-  (with-open [rdr (-> (get-config :user-agents-file)
-                      io/reader)]
-    (-> (line-seq rdr)
-        rand-nth)))
+  (let [uas-file-path (get-config :user-agents-file)]
+    (when (fs/exists? uas-file-path)
+      (with-open [rdr (io/reader uas-file-path)]
+        (-> (line-seq rdr)
+            rand-nth)))))
 
 (defn get-cert-domains
   "获取https url证书中的域名，SAN不一定就是自己拥有的域名"
