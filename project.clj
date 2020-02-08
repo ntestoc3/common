@@ -1,0 +1,14 @@
+(defproject ntestoc3/common "0.1.0"
+  :description "my common libs"
+  :url "http://example.com/FIXME"
+  :license {:name "MIT"
+            :url "https://opensource.org/licenses/MIT"}
+  :dependencies [[org.clojure/clojure "1.10.1"]
+                 [clj-http "3.10.0"]
+                 [com.taoensso/timbre "4.10.0"]    ; logging
+                 [me.raynes/fs "1.4.6"] ;; file util
+                 [net.lingala.zip4j/zip4j "2.3.1"] ;; zip with password
+                 [clojure.java-time "0.3.2"]       ; datetime
+                 [cprop/cprop "0.1.15"]            ;; env manage
+                 ]
+  :repl-options {:init-ns common.core})
