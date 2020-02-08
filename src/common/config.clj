@@ -55,6 +55,11 @@
   [path v]
   (swap! config assoc-in path v))
 
+(defn reset-config!
+  "重置运行以来的设置修改"
+  []
+  (reset! config {}))
+
 (defn save-config!
   "保存配置"
   ([] (save-config! (or (:conf env) default-config)))
@@ -62,3 +67,5 @@
    (spit file-name (-> (merge (read-curr-config)
                               @config)
                        pr-str))))
+
+

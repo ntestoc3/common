@@ -11,4 +11,7 @@
                  [clojure.java-time "0.3.2"]       ; datetime
                  [cprop/cprop "0.1.15"]            ;; env manage
                  ]
+  :profiles {:dev {:dependencies [[midje "1.9.9" :exclusions [org.clojure/clojure]]
+                                  ]
+                   :plugins [[lein-midje "3.2.1"]]}}
   :repl-options {:init-ns common.core})
