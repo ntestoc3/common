@@ -14,5 +14,8 @@
       (get-in (build-http-opt {:headers {"User-Agent" "none"}})
               [:headers "User-Agent"]) => "none"
 
+      (get-in (build-http-opt {:headers {"Forward" "127.0.0.1"}})
+              [:headers "User-Agent"]) => "googlebot+"
+
       (config/reset-config!)
       )

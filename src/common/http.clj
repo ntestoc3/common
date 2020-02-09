@@ -4,10 +4,10 @@
             [clj-http.client]
             [java-time :as time]
             [clojure.java.io :as io]
+            [common.core :refer [deep-merge]]
             [common.var :refer [pull]]
             [common.config :refer [get-config]]
             [taoensso.timbre :as log]
-
             [me.raynes.fs :as fs])
   (:import (org.apache.http.impl.cookie BasicClientCookie2)
            (java.net URL)
@@ -47,10 +47,10 @@
   默认会加上配置文件指定的:user-agent头"
   ([] (build-http-opt nil))
   ([custom-opt]
-    (merge {:headers {"User-Agent" (get-config :user-agent default-ua)
-                      "Accept-Charset" "utf-8"}}
-           (get-config :default-http-option)
-           custom-opt)))
+   (deep-merge {:headers {"User-Agent" (get-config :user-agent default-ua)
+                          "Accept-Charset" "utf-8"}}
+               (get-config :default-http-option)
+               custom-opt)))
 
 (defn get-cert-info
   [https-url]
