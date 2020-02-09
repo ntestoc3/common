@@ -41,14 +41,16 @@
 
 (def default-ua "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.87 Safari/537.36")
 
-(defn build-header
-  "从默认配置的http header加上custom-header构造http头"
-  ([] (build-header {}))
-  ([custom-header]
-    (merge (get-config :default-header)
-           {:headers {"User-Agent" (get-config :user-agent default-ua)
+(defn build-http-opt
+  "构造http请求参数
+  从配置文件的:default-http-option读取默认配置加上指定的`custom-opt`构造http请求参数
+  默认会加上配置文件指定的:user-agent头"
+  ([] (build-http-opt nil))
+  ([custom-opt]
+    (merge {:headers {"User-Agent" (get-config :user-agent default-ua)
                       "Accept-Charset" "utf-8"}}
-           custom-header)))
+           (get-config :default-http-option)
+           custom-opt)))
 
 (defn get-cert-info
   [https-url]
