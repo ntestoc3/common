@@ -1,4 +1,4 @@
-(defproject ntestoc3/common "1.2.2-SNAPSHOT"
+(defproject ntestoc3/common "1.3.2-SNAPSHOT"
   :description "my common libs helper"
   :url "https://github.com/ntestoc3/common"
   :license {:name "MIT"
@@ -9,6 +9,7 @@
                  [me.raynes/fs "1.4.6"] ;; file util
                  [net.lingala.zip4j/zip4j "2.3.1"] ;; zip with password
                  [clojure.java-time "0.3.2"]       ; datetime
+                 [listora/again "1.0.0"]
                  [cprop/cprop "0.1.15"]            ;; env manage
                  ]
   :profiles {:dev {:dependencies [[midje "1.9.9" :exclusions [org.clojure/clojure]]
