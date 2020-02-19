@@ -55,6 +55,11 @@
   [path v]
   (swap! config assoc-in path v))
 
+(defn update-config!
+  "更新配置项"
+  [k f & args]
+  (apply swap! config update k f args))
+
 (defn reset-config!
   "重置运行以来的设置修改"
   []

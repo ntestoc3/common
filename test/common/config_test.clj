@@ -46,6 +46,12 @@
 
           (set-config! :conf3 false)
           (get-config :conf3) => false
+
+          (update-config! :conf5 (constantly 1))
+          (get-config :conf5) => 1
+
+          (update-config! :conf5 inc)
+          (get-config :conf5) => 2
           )
         (reset-config!)
         (io/delete-file default-config)
