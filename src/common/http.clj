@@ -43,31 +43,30 @@
 
 (defn build-http-opt
   "构造http请求参数
-  从配置文件的:default-http-option读取默认配置加上指定的`custom-opt`构造http请求参数
-  默认会加上配置文件指定的:user-agent头"
+  从配置中读取:default-http-option并加上指定的`custom-opt`构造http请求参数
+  默认会加上配置指定的:user-agent头"
   ([] (build-http-opt nil))
   ([custom-opt]
-   (deep-merge {:headers {"User-Agent" (get-config :user-agent default-ua)
+   (deep-merge {:headers {"User-Agent" (or (get-config :user-agent)
+                                           default-ua)
                           "Accept-Charset" "utf-8"}}
                (get-config :default-http-option)
                custom-opt)))
 
 (defn get-cert-info
   [https-url]
-  (let [certs (-> (URL. https-url)
-                  (.openConnection)
-                  (doto (.connect))
-                  (.getServerCertificates))]
-    certs))
+  (-> (URL. https-url)
+      (.openConnection)
+      (doto (.connect))
+      (.getServerCertificates)))
 
 (defn random-ua
   "返回一个随机的user-agent"
-  []
-  (let [uas-file-path (get-config :user-agents-file)]
-    (when (fs/exists? uas-file-path)
-      (with-open [rdr (io/reader uas-file-path)]
-        (-> (line-seq rdr)
-            rand-nth)))))
+  [uas-file-path]
+  (when (fs/exists? uas-file-path)
+    (with-open [rdr (io/reader uas-file-path)]
+      (-> (line-seq rdr)
+          rand-nth))))
 
 (defn get-cert-domains
   "获取https url证书中的域名，SAN不一定就是自己拥有的域名"

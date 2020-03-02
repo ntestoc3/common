@@ -1,76 +1,41 @@
 (ns common.config
-  (:require [cprop.core :refer [load-config]]
-            [cprop.source :as source]
-            [common.fs-ext :as fs]))
+  (:require [omniconf.core :as cfg]
+            [me.raynes.fs :as fs]))
 
-(def default-config "config.edn")
-(fs/extract-resource! default-config)
+(defn init-config
+  "初始化配置，
+  :cli-args 命令行参数
+  :cfg-scheme 配置定义"
+  [{:keys [cli-args cfg-scheme] :as params
+    :or {cli-args []}}]
+  ;; define the configuration
+  (cfg/define
+    (merge {:conf {:type :file
+                   :verifier omniconf.core/verify-file-exists
+                   :description "APP configuration file path"}}
+           cfg-scheme))
+  ;; like- :some-option => SOME_OPTION
+  (cfg/populate-from-env)
+  ;; load properties to pick -Dconf for the config file
+  (cfg/populate-from-properties)
+  ;; Configuration file specified as
+  ;; Environment variable CONF or JVM Opt -Dconf
+  (when-let [conf (cfg/get :conf)]
+    (cfg/populate-from-file conf))
+  ;; like- :some-option => (java -Dsome-option=...)
+  ;; reload JVM args to overwrite configuration file params
+  (cfg/populate-from-properties)
+  ;; like- :some-option => -some-option
+  (cfg/populate-from-cmd cli-args)
+  ;; Verify the configuration(cfg/verify :quit-on-error quit-on-error))
+  (cfg/verify))
 
-(defn read-curr-config
-  "读取当前配置文件内容"
-  []
-  (source/ignore-missing-default (fn []
-                                   (source/from-file default-config))
-                                 nil))
-(def env
-  (merge
-   (source/from-env)
-   (source/from-system-props)
-   (read-curr-config)))
-
-(def config (atom {}))
-
-(defn- some-first
-  [& exps]
-  (if-some [r (first exps)]
-    r
-    (when (seq? exps)
-      (recur (next exps)))))
-
-;; 如果配置项值为nil,则会继续查找
 (defn get-config
-  "从全局配置和环境中 获取配置项k的值"
-  ([k] (get-config k nil))
-  ([k default] (some-first
-                (get @config k)
-                (get env k)
-                default)))
-
-(defn get-in-config
-  "从全局配置和环境中 获取配置path的值"
-  ([path] (get-in-config path nil))
-  ([path default]
-   (some-first
-    (get-in @config path)
-    (get-in env path)
-    default)))
+  "获取ks指定的配置， 可以指定多个key，获取嵌套的配置"
+  [& ks]
+  (apply cfg/get ks))
 
 (defn set-config!
-  "设置配置项"
-  [& kvs]
-  (apply swap! config assoc kvs))
-
-(defn set-in-config!
-  "设置配置项"
-  [path v]
-  (swap! config assoc-in path v))
-
-(defn update-config!
-  "更新配置项"
-  [k f & args]
-  (apply swap! config update k f args))
-
-(defn reset-config!
-  "重置运行以来的设置修改"
-  []
-  (reset! config {}))
-
-(defn save-config!
-  "保存配置"
-  ([] (save-config! (or (:conf env) default-config)))
-  ([file-name]
-   (spit file-name (-> (merge (read-curr-config)
-                              @config)
-                       pr-str))))
-
-
+  "临时设置配置项，建议仅用于repl测试"
+  [& args]
+  (apply cfg/set args))

@@ -1,17 +1,6 @@
 (ns common.log-ext
   (:require [taoensso.timbre :as log]
-            [again.core :as again]
             [taoensso.timbre.appenders.core :as appenders]))
-
-(defmulti log-attempt ::again/status)
-(defmethod log-attempt :retry [s]
-  (swap! (::again/user-context s) assoc :retried? true)
-  (log/warn "RETRY" s))
-(defmethod log-attempt :success [s]
-  (when (-> s ::again/user-context deref :retried?)
-    (log/info "SUCCESS after" (::again/attempts s) "attempts" s)))
-(defmethod log-attempt :failure [s]
-  (log/error "FAILURE" s))
 
 (def log-levels [:trace :debug :info :warn :error :fatal :report])
 
@@ -21,8 +10,6 @@
     {:pattern "yyyy/MM/dd HH:mm:ss"
      :locale (java.util.Locale/getDefault)
      :timezone (java.util.TimeZone/getDefault)}}))
-
-(defonce __log-time (log-time-format!))
 
 (defn make-log-appender
   "日志添加器
