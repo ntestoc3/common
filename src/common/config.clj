@@ -1,9 +1,11 @@
 (ns common.config
   (:require [omniconf.core :as cfg]
             [common.core :refer [deep-merge]]
+            [common.time]
             [fipp.edn :refer [pprint]]
             [me.raynes.fs :as fs]
-            [clojure.java.io :as io]))
+            [clojure.java.io :as io]
+            ))
 
 (defn init-config
   "初始化配置，
