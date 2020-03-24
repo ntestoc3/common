@@ -3,9 +3,11 @@
             [common.core :refer [deep-merge]]
             [common.time]
             [fipp.edn :refer [pprint]]
+            [clojure.edn :as edn]
             [me.raynes.fs :as fs]
             [clojure.java.io :as io]
-            ))
+            )
+  (:import (java.io File PushbackReader)))
 
 (defn init-config
   "初始化配置，
@@ -55,6 +57,11 @@
 (defn save-config!
   ([] (save-config! (cfg/get :conf)))
   ([save-path]
-   (with-open [w (io/writer save-path)]
-     (pprint @--new-configs-- {:writer w
-                               :width 0}))))
+   (let [old-conf  (with-open [r (-> (cfg/get :conf)
+                                     io/reader
+                                     PushbackReader.)]
+                     (edn/read {:eof nil} r))]
+     (with-open [w (io/writer save-path)]
+       (-> (deep-merge old-conf @--new-configs--)
+           (pprint {:writer w
+                    :width 0}))))))
