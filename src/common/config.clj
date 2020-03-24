@@ -1,6 +1,9 @@
 (ns common.config
   (:require [omniconf.core :as cfg]
-            [me.raynes.fs :as fs]))
+            [common.core :refer [deep-merge]]
+            [fipp.edn :refer [pprint]]
+            [me.raynes.fs :as fs]
+            [clojure.java.io :as io]))
 
 (defn init-config
   "初始化配置，
@@ -35,7 +38,21 @@
   [& ks]
   (apply cfg/get ks))
 
+(def ^:private --new-configs-- (atom {}))
+
 (defn set-config!
   "临时设置配置项，建议仅用于repl测试"
+  {:forms '([& ks value] [ks-vec value])}
   [& args]
-  (apply cfg/set args))
+  (let [k (if (sequential? (first args))
+            (ffirst args)
+            (first args))
+        new-v (apply cfg/set args)]
+    (swap! --new-configs-- assoc k (get new-v k))))
+
+(defn save-config!
+  ([] (save-config! (cfg/get :conf)))
+  ([save-path]
+   (with-open [w (io/writer save-path)]
+     (pprint @--new-configs-- {:writer w
+                               :width 0}))))
