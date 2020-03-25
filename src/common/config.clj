@@ -62,13 +62,12 @@
     (swap! --new-configs-- assoc k (get new-v k))))
 
 (defn save-config!
-  ([] (save-config! (cfg/get :conf)))
+  ([] (save-config! (get-config-path)))
   ([save-path]
-   (let [old-conf  (when-let [conf-path (get-config-path)]
-                     (with-open [r (-> conf-path
-                                       io/reader
-                                       PushbackReader.)]
-                       (edn/read {:eof nil} r)))]
+   (let [old-conf (with-open [r (-> save-path
+                                    io/reader
+                                    PushbackReader.)]
+                    (edn/read {:eof nil} r))]
      (with-open [w (io/writer save-path)]
        (-> (deep-merge old-conf @--new-configs--)
            (pprint {:writer w
