@@ -27,7 +27,10 @@
   (cfg/populate-from-properties)
   ;; Configuration file specified as
   ;; Environment variable CONF or JVM Opt -Dconf
-  (when-let [conf (cfg/get :conf)]
+  ;; or from config.edn
+  (when-let [conf (or (cfg/get :conf)
+                      (when (fs/exists? "config.edn")
+                        "config.edn"))]
     (cfg/populate-from-file conf))
   ;; like- :some-option => (java -Dsome-option=...)
   ;; reload JVM args to overwrite configuration file params
