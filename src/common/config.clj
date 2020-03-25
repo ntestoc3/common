@@ -9,6 +9,12 @@
             )
   (:import (java.io File PushbackReader)))
 
+(defn get-config-path
+  []
+  (or (cfg/get :conf)
+      (when (fs/exists? "config.edn")
+        "config.edn")))
+
 (defn init-config
   "初始化配置，
   :cli-args 命令行参数
@@ -28,9 +34,7 @@
   ;; Configuration file specified as
   ;; Environment variable CONF or JVM Opt -Dconf
   ;; or from config.edn
-  (when-let [conf (or (cfg/get :conf)
-                      (when (fs/exists? "config.edn")
-                        "config.edn"))]
+  (when-let [conf (get-config-path)]
     (cfg/populate-from-file conf))
   ;; like- :some-option => (java -Dsome-option=...)
   ;; reload JVM args to overwrite configuration file params
@@ -60,10 +64,11 @@
 (defn save-config!
   ([] (save-config! (cfg/get :conf)))
   ([save-path]
-   (let [old-conf  (with-open [r (-> (cfg/get :conf)
-                                     io/reader
-                                     PushbackReader.)]
-                     (edn/read {:eof nil} r))]
+   (let [old-conf  (when-let [conf-path (get-config-path)]
+                     (with-open [r (-> conf-path
+                                       io/reader
+                                       PushbackReader.)]
+                       (edn/read {:eof nil} r)))]
      (with-open [w (io/writer save-path)]
        (-> (deep-merge old-conf @--new-configs--)
            (pprint {:writer w
