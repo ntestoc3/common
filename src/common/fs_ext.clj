@@ -10,9 +10,7 @@
   [file-path]
   (if (fs/file? file-path)
     (fs/file file-path)
-    (some-> (io/resource file-path)
-            .toURI
-            io/file)))
+    (io/resource file-path)))
 
 (defn file-dir
   "获取文件的目录,如果是目录则返回目录本身"
