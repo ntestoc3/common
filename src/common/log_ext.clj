@@ -1,6 +1,8 @@
 (ns common.log-ext
   (:require [taoensso.timbre :as log]
-            [taoensso.timbre.appenders.core :as appenders]))
+            [taoensso.timbre.appenders.core :as appenders]
+            [taoensso.timbre.appenders.3rd-party.rotor :as rotor]
+            ))
 
 (def log-levels [:trace :debug :info :warn :error :fatal :report])
 
@@ -40,7 +42,11 @@
 
 (defn log-to-file!
   "配置log输出文件"
-  ([] (log-to-file! "logs.log"))
-  ([file-name]
-   (log-add-appender! {:spit (appenders/spit-appender {:fname file-name})})))
+  [{:keys [file-name max-size backlog]
+    :or {file-name "logs.log"
+         max-size (* 10 1024 1024)
+         backlog 5}}]
+  (log-add-appender! {:rotor-log (rotor/rotor-appender {:path file-name
+                                                        :max-size max-size
+                                                        :backlog backlog})}))
 
