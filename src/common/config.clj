@@ -66,10 +66,12 @@
 (defn update-config!
   "更新配置项"
   [k-or-ks f & args]
-  (let [k (if (sequential? k-or-ks)
+  (let [ks (if (sequential? k-or-ks)
             k-or-ks
-            [k-or-ks])]
-    (apply swap! --new-configs-- update-in k f args)))
+            [k-or-ks])
+        old-value (apply get-config ks)]
+    (->> (apply f old-value args)
+         (swap! --new-configs-- assoc-in ks))))
 
 (defn save-config!
   ([] (save-config! (get-config-path)))

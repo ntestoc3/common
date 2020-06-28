@@ -20,6 +20,12 @@
 
       (update-config! :test + 111)
       (get-config :test) => 234
+
+      (update-config! :students conj :a)
+      (update-config! :students conj :b)
+      (update-config! :students conj :c)
+      (get-config :students) => '(:c :b :a)
+
       )
 
 
