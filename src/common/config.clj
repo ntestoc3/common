@@ -44,22 +44,32 @@
   ;; Verify the configuration(cfg/verify :quit-on-error quit-on-error))
   (cfg/verify))
 
+(def ^:private --new-configs-- (atom {}))
+
 (defn get-config
   "获取ks指定的配置， 可以指定多个key，获取嵌套的配置"
   [& ks]
-  (apply cfg/get ks))
-
-(def ^:private --new-configs-- (atom {}))
+  (let [v (get-in @--new-configs-- ks)]
+    (if (nil? v) ;; 防止false值覆盖
+      (apply cfg/get ks)
+      v)))
 
 (defn set-config!
   "临时设置配置项，建议仅用于repl测试"
   {:forms '([& ks value] [ks-vec value])}
-  [& args]
-  (let [k (if (sequential? (first args))
-            (ffirst args)
-            (first args))
-        new-v (apply cfg/set args)]
-    (swap! --new-configs-- assoc k (get new-v k))))
+  [k-or-ks value]
+  (let [k (if (sequential? k-or-ks)
+            k-or-ks
+            [k-or-ks])]
+    (swap! --new-configs-- assoc-in k value)))
+
+(defn update-config!
+  "更新配置项"
+  [k-or-ks f & args]
+  (let [k (if (sequential? k-or-ks)
+            k-or-ks
+            [k-or-ks])]
+    (apply swap! --new-configs-- update-in k f args)))
 
 (defn save-config!
   ([] (save-config! (get-config-path)))
