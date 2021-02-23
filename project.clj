@@ -3,14 +3,14 @@
   :url "https://github.com/ntestoc3/common"
   :license {:name "MIT"
             :url "https://opensource.org/licenses/MIT"}
-  :dependencies [[org.clojure/clojure "1.10.1"]
-                 [clj-http "3.10.1"]
-                 [com.taoensso/timbre "4.10.0"]    ; logging
+  :dependencies [[org.clojure/clojure "1.10.2"]
+                 [clj-http "3.12.1"]
+                 [com.taoensso/timbre "5.1.2"]    ; logging
                  [me.raynes/fs "1.4.6"]            ;; file util
-                 [net.lingala.zip4j/zip4j "2.6.1"] ;; zip with password
+                 [net.lingala.zip4j/zip4j "2.7.0"] ;; zip with password
                  [clojure.java-time "0.3.2"]       ; datetime
-                 [diehard "0.10.0"]                 ;; guard
-                 [com.grammarly/omniconf "0.4.1"]  ;; config
+                 [diehard "0.10.3"]                 ;; guard
+                 [com.grammarly/omniconf "0.4.2"]  ;; config
                  [fipp "0.6.23"] ;; pretty print
                  ]
   :profiles {:dev {:dependencies
