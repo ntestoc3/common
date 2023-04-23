@@ -155,16 +155,29 @@
                                                 :transcription/temperature
                                                 :transcription/language]))
 
+(defn ->val
+  [v]
+  (if (keyword v)
+    (name v)
+    v))
+
 (defn transcribe-audio
   [{:keys [file model prompt response_format temperature language]
     :as request-body}]
   {:pre [(s/assert :transcription/api-request request-body)]}
   (api-req "/v1/audio/transcriptions"
-           {:multipart [{:name "file" :content (io/file file)}]
+           {:multipart (-> request-body
+                           (dissoc :file)
+                           (->> (map (fn [[k v]]
+                                       {:name (->val k)
+                                        :content (->val v)})))
+                           (conj {:name "file" :content (io/file file)}))
             :multipart-mode HttpMultipartMode/BROWSER_COMPATIBLE
-            :multipart-charset "UTF-8"
+            ;; :multipart-charset "UTF-8"
             :method :post
-            :form-params (dissoc request-body :file)}))
+            :insecure? true
+            :proxy-host "localhost"
+            :proxy-port 8080}))
 (comment
 
   (def models (get-models))
