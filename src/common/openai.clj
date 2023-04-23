@@ -10,14 +10,6 @@
 
 ;; https://platform.openai.com/docs/api-reference
 
-(config/init-config {:cfg-scheme
-                     {:openai-api-key {:type :string
-                                       :description "openai api key"}
-                      :openai-org {:type :string
-                                   :description "openai organization"}}})
-
-(def global-api-key (config/get-config :openai-api-key))
-
 (def api-host "https://api.openai.com")
 
 (defn api-req
@@ -32,7 +24,9 @@
          {:url (str api-host path)
           :method method
           :headers
-          {:authorization (str "Bearer " (or api-key global-api-key))}
+          {:authorization (str "Bearer " (or api-key
+                                             (System/getenv "OPENAI_API_KEY")
+                                             (config/get-config :openai-api-key)))}
           :as :json}
          (dissoc opts :api-key)))
        http/request
@@ -42,11 +36,17 @@
   []
   (api-req "/v1/models"))
 
-(defonce models (:data (get-models)))
-(defonce model-ids (set (map (comp keyword :id) models)))
+(defn model-id?
+  [id]
+  (defonce model-ids (->> (get-models)
+                          :data
+                          (map :id)
+                          set))
+  (model-ids (name id)))
 
 ;; 参数定义
-(s/def ::model (s/and keyword? model-ids))
+(s/def ::api-key string?)
+(s/def ::model model-id?)
 (s/def ::role (s/or :string-role (s/and string? #{"system" "user" "assistant"})
                     :keyword-role (s/and keyword? #{:system :user :assistant})))
 (s/def ::content string?)
@@ -78,7 +78,8 @@
                                        ::presence_penalty
                                        ::frequency_penalty
                                        ::logit_bias
-                                       ::user]))
+                                       ::user
+                                       ::api-key]))
 
 (defn chat
   [req-body]
@@ -90,7 +91,7 @@
 
 
 (s/def :edit/model (s/and (s/or :string string? :keyword keyword?)
-                          #(contains? #{"text-davinci-edit-001" "code-davinci-edit-001"} (str %))))
+                          #(contains? #{"text-davinci-edit-001" "code-davinci-edit-001"} (name %))))
 
 (s/def :edit/input string?)
 (s/def :edit/instruction string?)
@@ -104,7 +105,8 @@
                                  :opt [:edit/input
                                        :edit/n
                                        :edit/temperature
-                                       :edit/top_p]))
+                                       :edit/top_p
+                                       ::api-key]))
 
 (defn edit
   [req-body]
@@ -127,7 +129,8 @@
                                   :opt [:image/n
                                         :image/size
                                         :image/response_format
-                                        :image/user]))
+                                        :image/user
+                                        ::api-key]))
 
 (defn generate-image
   [request-body]
@@ -153,7 +156,8 @@
                                           :opt [:transcription/prompt
                                                 :transcription/response_format
                                                 :transcription/temperature
-                                                :transcription/language]))
+                                                :transcription/language
+                                                ::api-key]))
 
 (defn ->val
   [v]
@@ -180,6 +184,15 @@
 
   (def models (get-models))
 
+  ;; 初始化配置,使用配置设置key
+  (config/init-config {:cfg-scheme
+                       {:openai-api-key {:type :string
+                                         :description "openai api key"}
+                        :openai-org {:type :string
+                                     :description "openai organization"}}})
+  
+  (config/get-config :openai-api-key)
+
   ;; 打开参数验证
   (s/check-asserts true)
 
@@ -200,5 +213,7 @@
   (transcribe-audio {:file "/tmp/musicclass.m4a"
                      :model :whisper-1
                      })
+
+
 
   )
