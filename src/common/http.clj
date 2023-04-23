@@ -15,7 +15,7 @@
            ))
 
 ;; 导出clj-http的函数到当前命名空间
-(pull clj-http.client (get post))
+(pull clj-http.client (get post request))
 
 (defn new-cookie
   [name value domain]
