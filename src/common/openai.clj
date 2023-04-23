@@ -175,9 +175,7 @@
             :multipart-mode HttpMultipartMode/BROWSER_COMPATIBLE
             ;; :multipart-charset "UTF-8"
             :method :post
-            :insecure? true
-            :proxy-host "localhost"
-            :proxy-port 8080}))
+            }))
 (comment
 
   (def models (get-models))
