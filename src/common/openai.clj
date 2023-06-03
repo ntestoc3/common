@@ -190,7 +190,7 @@
                                          :description "openai api key"}
                         :openai-org {:type :string
                                      :description "openai organization"}}})
-  
+
   (config/get-config :openai-api-key)
 
   ;; 打开参数验证
@@ -214,6 +214,37 @@
                      :model :whisper-1
                      })
 
+
+
+  (def prod-review "The total ecommerce turnover in Italy is estimated to have been worth 75.89 billion euros in 2022. This is a growth of 18.6 percent, when compared to a year earlier. However, most of that growth was caused by price increases.
+
+These data come from the Ecommerce in Italy 2023 report from Casaleggio Associati, a digital strategy consulting business in Italy. In 2021, the ecommerce market in Italy reached a turnover of 64 billion euros, which was a growth of 33 percent compared to a year earlier. With a growth of 18.6 percent, it seems that the development of online sales is slowing down in the country.
+")
+
+  (def prod-review "7月14日下单，显示预计7月18日送达，货物物流位置看不懂！
+7月18日上午950616来电话 自称客服工号814412 说我的收货地址送不到，建议我重新下单。随后骂完你们的在线客服，货物立即开始配送。据在线客服解释：大家电是沿途配送的，这可以理解。但是我的货物从上午开始派送，“沿途”了几乎全城到晚上一遍一遍的投诉你们的才勉强送到。其他已预约好安装师傅18号当天上门安装，实际货到后联系说需要给我排队到21号。又骂完在线客服后，第二天中午才上门安装 垃圾！")
+
+  (chat {:model :gpt-3.5-turbo
+         :temperature 0 ;; 总结类的temp使用0，结果更准确
+         :messages [{:role :user
+                     :content (format "Your task is to generate a short summary of a product review from an ecommerce site.
+
+Summarize the review below, delimited by triple backtricks, in at most 30 words, and use chinese language.
+
+Review: ```%s```
+" prod-review)}
+                    ]})
+
+  (chat {:model :gpt-3.5-turbo
+         :temperature 0 ;; 总结类的temp使用0，结果更准确
+         :messages [{:role :user
+                     :content (format "你的任务是对电商网站上的产品评论生成一个简短的描述，并给定价部门进行反馈，用来调整产品价格。
+
+生成下面的使用```分割的评论的简短描述，回答尽可能的简短，关注价格和性价比，以及评论者的情绪，使用json格式，包含desc,feedback,user_felling
+
+评论: ```%s```
+" prod-review)}
+                    ]})
 
 
   )
