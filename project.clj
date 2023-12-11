@@ -3,6 +3,10 @@
   :url "https://github.com/ntestoc3/common"
   :license {:name "MIT"
             :url "https://opensource.org/licenses/MIT"}
+  :deploy-repositories [["clojars" {:url "https://clojars.org/repo"
+                                    :username :env/clojars_user
+                                    :password :env/clojars_pass
+                                    :sign-releases false}]]
   :dependencies [[org.clojure/clojure "1.11.1"]
                  [clj-http "3.12.3"]
                  [com.taoensso/timbre "6.3.1"]      ; logging
