@@ -1,7 +1,7 @@
 (ns common.log-ext
   (:require [taoensso.timbre :as log]
             [taoensso.timbre.appenders.core :as appenders]
-            [taoensso.timbre.appenders.3rd-party.rotor :as rotor]
+            [taoensso.timbre.appenders.community.rotor :as rotor]
             ))
 
 (def log-levels [:trace :debug :info :warn :error :fatal :report])
