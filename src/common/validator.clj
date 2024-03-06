@@ -27,13 +27,15 @@
 
 (defn valid-ipv4?
   [ip]
-  (-> (InetAddressValidator.)
-      (.isValidInet4Address ip)))
+  (and (string? ip)
+       (-> (InetAddressValidator.)
+           (.isValidInet4Address ip))))
 
 (defn valid-ipv6?
   [ip]
-  (-> (InetAddressValidator.)
-      (.isValidInet6Address ip)))
+  (and (string? ip)
+       (-> (InetAddressValidator.)
+           (.isValidInet6Address ip))))
 
 (def-validator Domain "是否为一个有效的域名")
 

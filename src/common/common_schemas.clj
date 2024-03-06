@@ -87,9 +87,17 @@
 
   (m/validate :ipv4 "192.168.0.256") := false
 
+  (m/validate :ipv4 nil) := false
+
   (mg/generate :ipv4)
 
   (m/validate  :ipv6 "2001:0db8:85a3:0000:0000:8a2e:0370:7334") := true
+
+  (m/validate  :ipv6 "") := false
+
+  (m/validate  :ipv6 nil) := false
+
+  (m/validate  :ipv6 8) := false
 
   (mg/generate :ipv6)
 
